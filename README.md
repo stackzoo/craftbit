@@ -1,5 +1,6 @@
 #  CRAFTBIT  
-[![CI](https://github.com/stackzoo/craftbit/actions/workflows/ci.yaml/badge.svg)](https://github.com/stackzoo/craftbit/actions/workflows/ci.yaml) [![Go Report Card](https://goreportcard.com/badge/github.com/stackzoo/craftbit)](https://goreportcard.com/report/github.com/stackzoo/craftbit) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
+[![CI](https://github.com/stackzoo/craftbit/actions/workflows/ci.yaml/badge.svg)](https://github.com/stackzoo/craftbit/actions/workflows/ci.yaml) [![Go Report Card](https://goreportcard.com/badge/github.com/stackzoo/craftbit)](https://goreportcard.com/report/github.com/stackzoo/craftbit)  
+[![Latest Release](https://img.shields.io/github/release/stackzoo/craftbit.svg)](https://github.com/stackzoo/craftbit/releases/latest) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
 
 <img src="docs/images/logo.png" width="100" height="100" />
 <br/>

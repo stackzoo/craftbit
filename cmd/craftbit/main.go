@@ -24,7 +24,7 @@ func main() {
 		// Choose a utility.
 		huh.NewGroup(
 			huh.NewSelect[string]().
-				Options(huh.NewOptions("Decode Raw Transaction", "Bech32", "Hack Bitcoin")...).
+				Options(huh.NewOptions("Decode Raw Transaction", "Bech32", "Transaction History", "Hack Bitcoin")...).
 				Title("Choose your utility").
 				Description("CraftBit has utilities for everyone!").
 				Validate(func(t string) error {
@@ -90,7 +90,51 @@ func main() {
 				Render(output.String()),
 		)
 
-	case "Bech32":
+	case "Transaction History":
+		address := ""
+		formTransactionHistory := huh.NewForm(
+			huh.NewGroup(
+				huh.NewInput().
+					Value(&address).
+					Title("Enter Bitcoin address").
+					Placeholder("e.g., bc1q0xs2775td0fm2t80m5alnmv5j6jhxqkgsdz5rv").
+					Description("Enter the Bitcoin address to fetch transaction history"),
+			),
+		)
+
+		err := formTransactionHistory.Run()
+		if err != nil {
+			fmt.Println("Uh oh:", err)
+			os.Exit(1)
+		}
+
+		transactionHistory, err := pkg.GetTransactionHistory(address)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		}
+
+		var transactionOutput string
+		transactionOutput += fmt.Sprintf("Transaction History for %s\n", address)
+		for i, tx := range transactionHistory {
+			transactionOutput += fmt.Sprintf("%d. TxID: %s, Fee: %d\n", i+1, tx.TxID, tx.Amount)
+		}
+
+		TxHistory := func() {
+			time.Sleep(2 * time.Second)
+		}
+
+		_ = spinner.New().Title("Retrieving latest transactions...").Action(TxHistory).Run()
+		fmt.Println(
+			lipgloss.NewStyle().
+				Width(100).
+				BorderStyle(lipgloss.RoundedBorder()).
+				BorderForeground(lipgloss.Color("63")).
+				Padding(1, 2).
+				Render(transactionOutput),
+		)
+
+	case "Bech32": // TO DO: COMPLETE LOGIC
 		var operation string
 		formBech32 := huh.NewForm(
 			huh.NewGroup(huh.NewNote().
@@ -137,47 +181,3 @@ func main() {
 	}
 
 }
-
-// #####################################################################################
-
-// 	prepareBurger := func() {
-// 		time.Sleep(2 * time.Second)
-// 	}
-
-// 	_ = spinner.New().Title("Preparing your burger...").Accessible(accessible).Action(prepareBurger).Run()
-
-// 	// Print order summary.
-// 	{
-// 		var sb strings.Builder
-// 		keyword := func(s string) string {
-// 			return lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Render(s)
-// 		}
-// 		fmt.Fprintf(&sb,
-// 			"%s\n\nOne %s%s, topped with %s with %s on the side.",
-// 			lipgloss.NewStyle().Bold(true).Render("BURGER RECEIPT"),
-// 			keyword(order.Burger.Spice.String()),
-// 			keyword(order.Burger.Type),
-// 			keyword(xstrings.EnglishJoin(order.Burger.Toppings, true)),
-// 			keyword(order.Side),
-// 		)
-
-// 		name := order.Name
-// 		if name != "" {
-// 			name = ", " + name
-// 		}
-// 		fmt.Fprintf(&sb, "\n\nThanks for your order%s!", name)
-
-// 		if order.Discount {
-// 			fmt.Fprint(&sb, "\n\nEnjoy 15% off.")
-// 		}
-
-// 		fmt.Println(
-// 			lipgloss.NewStyle().
-// 				Width(40).
-// 				BorderStyle(lipgloss.RoundedBorder()).
-// 				BorderForeground(lipgloss.Color("63")).
-// 				Padding(1, 2).
-// 				Render(sb.String()),
-// 		)
-// 	}
-// }

@@ -8,7 +8,7 @@ This software is a lightweight Command Line Interface (CLI) containing multiple 
 These utilities are reusable and located within the `pkg` folder.  
 Most of these utilities either serve as wrappers for [*btcd*](https://github.com/btcsuite/btcd) libraries or make calls to the [*mempool.space REST APIs*](https://mempool.space/docs/api/rest).  
 
-> **Warning**
+> [!WARNING] 
 > As certain functions leverage the APIs of the public instance of mempool.space, this tool may be suboptimal from a privacy perspective and inadvertently expose personally identifiable information (PII) such as transactions or addresses.
 
 

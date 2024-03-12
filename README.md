@@ -1,4 +1,6 @@
-#  CRAFTBIT
+#  CRAFTBIT  
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
+
 <img src="docs/images/logo.png" width="100" height="100" />
 <br/>
 Bitcoin Swiss Army Knife 🪛 🌕 🔧

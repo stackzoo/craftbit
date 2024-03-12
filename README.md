@@ -1,5 +1,5 @@
 #  CRAFTBIT  
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
+[![CI](https://github.com/stackzoo/craftbit/actions/workflows/ci.yaml/badge.svg)](https://github.com/stackzoo/craftbit/actions/workflows/ci.yaml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
 
 <img src="docs/images/logo.png" width="100" height="100" />
 <br/>

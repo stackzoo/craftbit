@@ -43,7 +43,7 @@ brews:
       # Repository owner.
       #
       # Templates: allowed
-      owner: r3drun3
+      owner: stackzoo
 
       # Repository name.
       #

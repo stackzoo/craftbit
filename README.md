@@ -35,8 +35,7 @@ Go to the [*release*](https://github.com/stackzoo/craftbit/releases) page and do
 
 
 
-## Example
+## Usage
 
-https://github.com/stackzoo/craftbit/assets/102741679/2ee9dd77-4986-4bcb-ae17-9d94670fc9cc
 
 

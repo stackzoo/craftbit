@@ -5,21 +5,21 @@
 class Craftbit < Formula
   desc "Bitcoin Swiss Army Knife 🪛 🌕 🔧"
   homepage "https://www.stackzoo.io/"
-  version "0.0.8"
+  version "0.0.9"
   license "MIT"
 
   on_macos do
-    if Hardware::CPU.arm?
-      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.8/craftbit_0.0.8_darwin_arm64.tar.gz"
-      sha256 "a9e00de8672a9acd93a0d69fa266397c982a194b52adfa04394248d2b701126c"
+    if Hardware::CPU.intel?
+      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.9/craftbit_0.0.9_darwin_amd64.tar.gz"
+      sha256 "dabb8f0dc9c76b32e0396c6e4aeb83b49518c6c6ca97878d77cac15bfd60a389"
 
       def install
         bin.install "craftbit"
       end
     end
-    if Hardware::CPU.intel?
-      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.8/craftbit_0.0.8_darwin_amd64.tar.gz"
-      sha256 "b946052e64c9eb3a87d74b51c8fdbeaf7122658703a0f5cd9a19992927ec4b0a"
+    if Hardware::CPU.arm?
+      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.9/craftbit_0.0.9_darwin_arm64.tar.gz"
+      sha256 "bb42906dc913184cdad40199e2f1eb568910a0ab817d01d7d457f3d451db0dc8"
 
       def install
         bin.install "craftbit"
@@ -29,16 +29,16 @@ class Craftbit < Formula
 
   on_linux do
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.8/craftbit_0.0.8_linux_arm64.tar.gz"
-      sha256 "6ba85b0961b96eabbed8031561dceb784791cc346bdb7ccee61f6cbe25c5ba91"
+      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.9/craftbit_0.0.9_linux_arm64.tar.gz"
+      sha256 "73f04bc6b37598e817408be4c5db7f921961ee51d85f98ce2130a59630d08e9c"
 
       def install
         bin.install "craftbit"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.8/craftbit_0.0.8_linux_amd64.tar.gz"
-      sha256 "b990befaa3ebc9bb8fe5c5dbac7b504cf7debd913c57d1f5aff1d699725524b6"
+      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.9/craftbit_0.0.9_linux_amd64.tar.gz"
+      sha256 "199a44d47dd88e78c6901c1b689c9df37f1cd05d1e09c7eb870fd079c4afcb83"
 
       def install
         bin.install "craftbit"

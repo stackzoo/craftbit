@@ -26,7 +26,7 @@ func Run() {
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Options(huh.NewOptions("Decode Raw Transaction", "Bech32", "Transaction History", "Generate HD Private Key",
-					"Get Price", "Get Recommended Fees", "Get Lightning Network Stats", "Hack Bitcoin")...).
+					"Get Price", "Get Recommended Fees", "Get Lightning Network Stats", "Get Last Block", "Hack Bitcoin")...).
 				Title("Choose your utility").
 				Description("CraftBit has utilities for everyone!").
 				Validate(func(t string) error {
@@ -260,6 +260,26 @@ func Run() {
 				BorderForeground(lipgloss.Color("63")).
 				Padding(1, 2).
 				Render("LIGHTNING NETWORK STATS\n\n" + lnStatsDTO),
+		)
+
+	case "Get Last Block":
+		lastBlock, err := pkg.GetLastBlock()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		getLastBlock := func() {
+			time.Sleep(1 * time.Second)
+		}
+
+		_ = spinner.New().Title("Get last block in the blockchain...").Action(getLastBlock).Run()
+		fmt.Println(
+			lipgloss.NewStyle().
+				Width(100).
+				BorderStyle(lipgloss.RoundedBorder()).
+				BorderForeground(lipgloss.Color("63")).
+				Padding(1, 2).
+				Render("LAST BLOCK\n\n" + lastBlock),
 		)
 
 	default:

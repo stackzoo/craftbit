@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 	"time"
 
@@ -24,7 +25,8 @@ func Run() {
 		// Choose a utility.
 		huh.NewGroup(
 			huh.NewSelect[string]().
-				Options(huh.NewOptions("Decode Raw Transaction", "Bech32", "Transaction History", "Generate HD Private Key", "Hack Bitcoin")...).
+				Options(huh.NewOptions("Decode Raw Transaction", "Bech32", "Transaction History", "Generate HD Private Key",
+					"Get Price", "Hack Bitcoin")...).
 				Title("Choose your utility").
 				Description("CraftBit has utilities for everyone!").
 				Validate(func(t string) error {
@@ -77,7 +79,7 @@ func Run() {
 			output.WriteString(fmt.Sprintf("TRANSACTION OUTPUT %d: %s\n", i+1, outputStr))
 		}
 		decodeTx := func() {
-			time.Sleep(2 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 
 		_ = spinner.New().Title("Decoding Transaction...").Action(decodeTx).Run()
@@ -121,7 +123,7 @@ func Run() {
 		}
 
 		TxHistory := func() {
-			time.Sleep(2 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 
 		_ = spinner.New().Title("Retrieving latest transactions...").Action(TxHistory).Run()
@@ -183,15 +185,41 @@ func Run() {
 			return
 		}
 		generateSeed := func() {
-			time.Sleep(2 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 
 		_ = spinner.New().Title("Generating Hierarchical Deterministic Private Key...").Action(generateSeed).Run()
 		fmt.Println("Base58 Private Key:", privateKey)
 		fmt.Println("DO NOT SHARE WITH ANYONE 💀")
 
+	case "Get Price":
+		prices, err := pkg.GetPrices()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		getPrices := func() {
+			time.Sleep(1 * time.Second)
+		}
+
+		_ = spinner.New().Title("Get BTC current price...").Action(getPrices).Run()
+		//fmt.Println("Prices:\n", prices)
+		PrintStructFields(prices)
 	default:
 		fmt.Println("Invalid selection")
 	}
 
+}
+
+func PrintStructFields(s interface{}) {
+	val := reflect.ValueOf(s)
+	typ := val.Type()
+
+	for i := 0; i < val.NumField(); i++ {
+		field := val.Field(i)
+		fieldName := typ.Field(i).Name
+		fieldValue := field.Interface()
+
+		fmt.Printf("%s: %v\n", fieldName, fieldValue)
+	}
 }

@@ -11,9 +11,6 @@ import (
 	"github.com/charmbracelet/huh/spinner"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/stackzoo/craftbit/pkg"
-
-	"github.com/btcsuite/btcd/btcutil/hdkeychain"
-	"github.com/btcsuite/btcd/chaincfg"
 )
 
 func main() {
@@ -180,28 +177,17 @@ func main() {
 		}
 
 	case "Generate HD Private Key":
-		// Generate a random seed at the recommended length.
-		seed, err := hdkeychain.GenerateSeed(hdkeychain.RecommendedSeedLen)
+		privateKey, err := pkg.GenerateHDPrivateKey()
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-
-		// Generate a new master node using the seed.
-		key, err := hdkeychain.NewMaster(seed, &chaincfg.MainNetParams)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-
-		// Show that the generated master node extended key is private.
-		base58PrivateKey := key.String()
 		generateSeed := func() {
 			time.Sleep(2 * time.Second)
 		}
 
 		_ = spinner.New().Title("Generating Hierarchical Deterministic Private Key...").Action(generateSeed).Run()
-		fmt.Println("Base58 Private Key:", base58PrivateKey)
+		fmt.Println("Base58 Private Key:", privateKey)
 		fmt.Println("DO NOT SHARE WITH ANYONE 💀")
 
 	default:

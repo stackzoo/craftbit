@@ -26,7 +26,7 @@ func Run() {
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Options(huh.NewOptions("Decode Raw Transaction", "Bech32", "Transaction History", "Generate HD Private Key",
-					"Get Price", "Get Recommended Fees", "Get Lightning Network Stats", "Get Last Block", "Hack Bitcoin")...).
+					"Get Price", "Get Recommended Fees", "Get Last Block", "Get Lightning Network Stats", "Get Lightning Top Nodes", "Hack Bitcoin")...).
 				Title("Choose your utility").
 				Description("CraftBit has utilities for everyone!").
 				Validate(func(t string) error {
@@ -260,6 +260,36 @@ func Run() {
 				BorderForeground(lipgloss.Color("63")).
 				Padding(1, 2).
 				Render("LIGHTNING NETWORK STATS\n\n" + lnStatsDTO),
+		)
+
+	case "Get Lightning Top Nodes":
+		lnTopNodes, err := pkg.GetLightningTopNodes()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		getLnTopNodes := func() {
+			time.Sleep(1 * time.Second)
+		}
+
+		_ = spinner.New().Title("Get lightning network top nodes...").Action(getLnTopNodes).Run()
+		lnTopNodesCapacity := lnTopNodes.ByCapacityString()
+		fmt.Println(
+			lipgloss.NewStyle().
+				Width(100).
+				BorderStyle(lipgloss.RoundedBorder()).
+				BorderForeground(lipgloss.Color("63")).
+				Padding(1, 2).
+				Render("LIGHTNING TOP NODES BY CAPACITY\n\n" + lnTopNodesCapacity),
+		)
+		lnTopNodesChannels := lnTopNodes.ByChannelsString()
+		fmt.Println(
+			lipgloss.NewStyle().
+				Width(100).
+				BorderStyle(lipgloss.RoundedBorder()).
+				BorderForeground(lipgloss.Color("63")).
+				Padding(1, 2).
+				Render("LIGHTNING TOP NODES BY NUMBER OF CHANNELS\n\n" + lnTopNodesChannels),
 		)
 
 	case "Get Last Block":

@@ -189,8 +189,15 @@ func Run() {
 		}
 
 		_ = spinner.New().Title("Generating Hierarchical Deterministic Private Key...").Action(generateSeed).Run()
-		fmt.Println("Base58 Private Key:", privateKey)
-		fmt.Println("DO NOT SHARE WITH ANYONE 💀")
+		keyOutput := "BASE58 PRIVATE KEY:\n" + privateKey + "\n\nDO NOT SHARE WITH ANYONE 💀"
+		fmt.Println(
+			lipgloss.NewStyle().
+				Width(100).
+				BorderStyle(lipgloss.RoundedBorder()).
+				BorderForeground(lipgloss.Color("63")).
+				Padding(1, 2).
+				Render(keyOutput),
+		)
 
 	case "Get Price":
 		prices, err := pkg.GetPrices()
@@ -203,7 +210,15 @@ func Run() {
 		}
 
 		_ = spinner.New().Title("Get BTC current price...").Action(getPrices).Run()
-		PrintStructFields(prices)
+		pricesDTO := StructFieldsToString(prices)
+		fmt.Println(
+			lipgloss.NewStyle().
+				Width(100).
+				BorderStyle(lipgloss.RoundedBorder()).
+				BorderForeground(lipgloss.Color("63")).
+				Padding(1, 2).
+				Render("PRICE\n\n" + pricesDTO),
+		)
 
 	case "Get Recommended Fees":
 		fees, err := pkg.GetFees()
@@ -216,7 +231,15 @@ func Run() {
 		}
 
 		_ = spinner.New().Title("Get recommended fees...").Action(getFees).Run()
-		PrintStructFields(fees)
+		feesDTO := StructFieldsToString(fees)
+		fmt.Println(
+			lipgloss.NewStyle().
+				Width(100).
+				BorderStyle(lipgloss.RoundedBorder()).
+				BorderForeground(lipgloss.Color("63")).
+				Padding(1, 2).
+				Render("RECOMMENDED FEES\n\n" + feesDTO),
+		)
 
 	case "Get Lightning Network Stats":
 		lnStats, err := pkg.GetLightningStatistics()
@@ -229,7 +252,15 @@ func Run() {
 		}
 
 		_ = spinner.New().Title("Get lightning network statistics...").Action(getLnStats).Run()
-		PrintStructFields(lnStats.Latest)
+		lnStatsDTO := StructFieldsToString(lnStats.Latest)
+		fmt.Println(
+			lipgloss.NewStyle().
+				Width(100).
+				BorderStyle(lipgloss.RoundedBorder()).
+				BorderForeground(lipgloss.Color("63")).
+				Padding(1, 2).
+				Render("LIGHTNING NETWORK STATS\n\n" + lnStatsDTO),
+		)
 
 	default:
 		fmt.Println("Invalid selection")
@@ -248,4 +279,21 @@ func PrintStructFields(s interface{}) {
 
 		fmt.Printf("%s: %v\n", fieldName, fieldValue)
 	}
+}
+
+func StructFieldsToString(s interface{}) string {
+	val := reflect.ValueOf(s)
+	typ := val.Type()
+
+	var builder strings.Builder
+
+	for i := 0; i < val.NumField(); i++ {
+		field := val.Field(i)
+		fieldName := typ.Field(i).Name
+		fieldValue := fmt.Sprintf("%v", field.Interface())
+
+		builder.WriteString(fmt.Sprintf("%s: %s\n", fieldName, fieldValue))
+	}
+
+	return builder.String()
 }

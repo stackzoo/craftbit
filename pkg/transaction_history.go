@@ -1,5 +1,3 @@
-// pkg/transaction_history.go
-
 package pkg
 
 import (

@@ -26,7 +26,7 @@ func Run() {
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Options(huh.NewOptions("Decode Raw Transaction", "Bech32", "Transaction History", "Generate HD Private Key",
-					"Get Price", "Hack Bitcoin")...).
+					"Get Price", "Get Recommended Fees", "Hack Bitcoin")...).
 				Title("Choose your utility").
 				Description("CraftBit has utilities for everyone!").
 				Validate(func(t string) error {
@@ -203,8 +203,21 @@ func Run() {
 		}
 
 		_ = spinner.New().Title("Get BTC current price...").Action(getPrices).Run()
-		//fmt.Println("Prices:\n", prices)
 		PrintStructFields(prices)
+
+	case "Get Recommended Fees":
+		fees, err := pkg.GetFees()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		getFees := func() {
+			time.Sleep(1 * time.Second)
+		}
+
+		_ = spinner.New().Title("Get recommended fees...").Action(getFees).Run()
+		PrintStructFields(fees)
+
 	default:
 		fmt.Println("Invalid selection")
 	}

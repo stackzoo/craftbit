@@ -1,5 +1,3 @@
-// pkg/decode_raw_transaction.go
-
 package pkg
 
 import (

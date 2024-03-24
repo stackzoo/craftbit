@@ -1,5 +1,3 @@
-// pkg/bech32.go
-
 package pkg
 
 import (

@@ -1,5 +1,3 @@
-// pkg/price.go
-
 package pkg
 
 import (

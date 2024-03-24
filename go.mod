@@ -8,7 +8,9 @@ require (
 )
 
 require (
+	github.com/btcsuite/btcd/btcec/v2 v2.1.3 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
 	golang.org/x/crypto v0.21.0 // indirect
 )
 
@@ -21,7 +23,6 @@ require (
 	github.com/charmbracelet/bubbletea v0.25.0 // indirect
 	github.com/charmbracelet/huh/spinner v0.0.0-20240306161957-71f31c155b08
 	github.com/charmbracelet/lipgloss v0.10.0
-	github.com/charmbracelet/x/exp/strings v0.0.0-20240307183742-ad8dadc14f31
 	github.com/containerd/console v1.0.4 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect

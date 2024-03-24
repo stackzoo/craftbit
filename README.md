@@ -36,8 +36,6 @@ Go to the [*release*](https://github.com/stackzoo/craftbit/releases) page and do
 
 
 ## Usage
-<video autoplay loop muted playsinline>
-  <source src="/docs/images/usage.mov" type="video/mp4">
-</video>
+![usage](docs/images/usage.gif)  
 
 

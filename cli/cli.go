@@ -25,7 +25,7 @@ func Run() {
 		// Choose a utility.
 		huh.NewGroup(
 			huh.NewSelect[string]().
-				Options(huh.NewOptions("Decode Raw Transaction", "Bech32", "Transaction History", "Generate HD Private Key",
+				Options(huh.NewOptions("Decode Raw Transaction", "Bech32", "Transaction History", "Generate HD Private Key", "Generate P2PKH Address from HD Private Key",
 					"Get Price", "Get Recommended Fees", "Get Last Block", "Get Lightning Network Stats", "Get Lightning Top Nodes", "Hack Bitcoin")...).
 				Title("Choose your utility").
 				Description("CraftBit has utilities for everyone!").
@@ -197,6 +197,47 @@ func Run() {
 				BorderForeground(lipgloss.Color("63")).
 				Padding(1, 2).
 				Render(keyOutput),
+		)
+
+	case "Generate P2PKH Address from HD Private Key":
+		hdPrivateKey := ""
+		formAddressFromHdPrivateKey := huh.NewForm(
+			huh.NewGroup(
+				huh.NewInput().
+					Value(&hdPrivateKey).
+					Title("Enter Bitcoin extended private key (xprv)").
+					Placeholder("e.g., xprv9s21ZrQH143K2TQH119ScPgTzuL2mw2USC7QzsogsFobCeaSZ8Q8kUUMtkPWSksAEiDTSvRhtWkhk5AfZizxcWqx5NXDwkxKiJcnSGavNUZ").
+					Description("Enter the Bitcoin HD Private Key for wich to generate a new address"),
+			),
+		)
+
+		err := formAddressFromHdPrivateKey.Run()
+		if err != nil {
+			fmt.Println("Uh oh:", err)
+			os.Exit(1)
+		}
+
+		key, err := pkg.CreateP2pkhAddressFromPrivateKey(hdPrivateKey)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		}
+
+		var transactionOutput string
+		transactionOutput += fmt.Sprintf("Transaction History for %s\n", key)
+
+		AddressFromPrivateKey := func() {
+			time.Sleep(1 * time.Second)
+		}
+
+		_ = spinner.New().Title("Generating Address...").Action(AddressFromPrivateKey).Run()
+		fmt.Println(
+			lipgloss.NewStyle().
+				Width(100).
+				BorderStyle(lipgloss.RoundedBorder()).
+				BorderForeground(lipgloss.Color("63")).
+				Padding(1, 2).
+				Render("Generated P2PKH Address\n" + key),
 		)
 
 	case "Get Price":

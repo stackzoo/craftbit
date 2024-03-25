@@ -5,21 +5,21 @@
 class Craftbit < Formula
   desc "Bitcoin Swiss Army Knife 🪛 🌕 🔧"
   homepage "https://www.stackzoo.io/"
-  version "0.0.9"
+  version "0.0.10"
   license "MIT"
 
   on_macos do
-    if Hardware::CPU.intel?
-      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.9/craftbit_0.0.9_darwin_amd64.tar.gz"
-      sha256 "dabb8f0dc9c76b32e0396c6e4aeb83b49518c6c6ca97878d77cac15bfd60a389"
+    if Hardware::CPU.arm?
+      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.10/craftbit_0.0.10_darwin_arm64.tar.gz"
+      sha256 "8922e24bff37ca0891ceb66353089ec605c17912caf75f7492c8471246437533"
 
       def install
         bin.install "craftbit"
       end
     end
-    if Hardware::CPU.arm?
-      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.9/craftbit_0.0.9_darwin_arm64.tar.gz"
-      sha256 "bb42906dc913184cdad40199e2f1eb568910a0ab817d01d7d457f3d451db0dc8"
+    if Hardware::CPU.intel?
+      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.10/craftbit_0.0.10_darwin_amd64.tar.gz"
+      sha256 "9faa9b3b96b3df018708701e26738484a4126579dc1bcdd11f13c5354093fea5"
 
       def install
         bin.install "craftbit"
@@ -28,17 +28,17 @@ class Craftbit < Formula
   end
 
   on_linux do
-    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.9/craftbit_0.0.9_linux_arm64.tar.gz"
-      sha256 "73f04bc6b37598e817408be4c5db7f921961ee51d85f98ce2130a59630d08e9c"
+    if Hardware::CPU.intel?
+      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.10/craftbit_0.0.10_linux_amd64.tar.gz"
+      sha256 "9ad76831156d4b17d385ef34b78628488af0b0377ff6e60cfec38db21aee1e79"
 
       def install
         bin.install "craftbit"
       end
     end
-    if Hardware::CPU.intel?
-      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.9/craftbit_0.0.9_linux_amd64.tar.gz"
-      sha256 "199a44d47dd88e78c6901c1b689c9df37f1cd05d1e09c7eb870fd079c4afcb83"
+    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
+      url "https://github.com/stackzoo/craftbit/releases/download/v0.0.10/craftbit_0.0.10_linux_arm64.tar.gz"
+      sha256 "8e854edb25d8a4e976254843e381293b052e21f21656b4adf0008b0623780fc4"
 
       def install
         bin.install "craftbit"

@@ -21,6 +21,19 @@ This tool serves multiple purposes:
 2. It provides reusable atomic packages and functions, organized under the `pkg` folder.
 3. It aims to serve as an educational aid for individuals new to the Bitcoin world.  
 
+## Supported Features
+Following are some of the tool's supported features:  
+1. Decode raw transaction
+1. Generate hierarchical deterministic private key
+1. Generate P2PKH address from hd private key
+1. Retrieve current BTC price in multiple currencies
+1. Retrieve latest block heigh in the blockchain
+1. Retrieve current recommended fees
+1. Retrieve Lightning networ statistics
+1. Retrieve Lightning network top nodes
+1. Retrieve address transaction history  
+
+
 
 ## How to install
 ### Homebrew

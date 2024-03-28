@@ -27,7 +27,7 @@ func Run() {
 			huh.NewGroup(
 				huh.NewSelect[string]().
 					Options(huh.NewOptions("Decode Raw Transaction", "Bech32", "Transaction History", "Generate HD Private Key", "Generate P2PKH Address from HD Private Key",
-						"Get Price", "Get Recommended Fees", "Get Last Block", "Get Mempool Status", "Get Lightning Network Stats", "Get Lightning Top Nodes", "Hack Bitcoin")...).
+						"Get Price", "Get Recommended Fees", "Get Last Block", "Get Mempool Status", "Get Current Hashrate", "Get Lightning Network Stats", "Get Lightning Top Nodes", "Hack Bitcoin")...).
 					Title("Choose your utility").
 					Description("CraftBit has utilities for everyone!").
 					Validate(func(t string) error {
@@ -373,6 +373,27 @@ func Run() {
 					BorderForeground(lipgloss.Color("63")).
 					Padding(1, 2).
 					Render("MEMPOOL STATUS\n\n" + mempoolStatusDTO),
+			)
+
+		case "Get Current Hashrate":
+			currentHashrate, err := pkg.GetCurrentHashrate()
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			getCurrentHashrate := func() {
+				time.Sleep(1 * time.Second)
+			}
+
+			_ = spinner.New().Title("Get current hashrate...").Action(getCurrentHashrate).Run()
+			currentHashrateDTO := StructFieldsToString(currentHashrate)
+			fmt.Println(
+				lipgloss.NewStyle().
+					Width(100).
+					BorderStyle(lipgloss.RoundedBorder()).
+					BorderForeground(lipgloss.Color("63")).
+					Padding(1, 2).
+					Render("CURRENT HASHRATE\n\n" + currentHashrateDTO),
 			)
 
 		default:

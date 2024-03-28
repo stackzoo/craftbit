@@ -46,7 +46,15 @@ brew install craftbit
 ### Releases
 Go to the [*release*](https://github.com/stackzoo/craftbit/releases) page and download the binary for your OS.  
 
+## How to update
+### Homebrew
+If you installed craftbit via *homebrew*, you can update to the latest version with the following command:  
+```console
+brew update && brew upgrade craftbit
+```  
 
+### Releases
+Go to the [*release*](https://github.com/stackzoo/craftbit/releases) page and download the latest binary for your OS.  
 
 ## Usage
 ![usage](docs/images/usage.gif)  

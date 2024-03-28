@@ -33,6 +33,7 @@ var utilities = []UtilityRunner{
 	{"Get Last Block", getLastBlock, "Get last block in the blockchain..."},
 	{"Get Mempool Status", getMempoolStatus, "Get mempool status..."},
 	{"Get Current Hashrate", getCurrentHashrate, "Get current hashrate..."},
+	{"Hack Bitcoin 👾", nil, ""},
 }
 
 func Run() {
@@ -70,7 +71,7 @@ func chooseUtility() string {
 				Title("Choose your utility").
 				Description("CraftBit has utilities for everyone!").
 				Validate(func(t string) error {
-					if t == "Hack Bitcoin" {
+					if t == "Hack Bitcoin 👾" {
 						return fmt.Errorf("nice try, cannot do that, sorry 😊")
 					}
 					return nil

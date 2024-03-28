@@ -14,430 +14,358 @@ import (
 	"github.com/stackzoo/craftbit/pkg"
 )
 
+type UtilityRunner struct {
+	Utility   string
+	Operation func() (interface{}, error)
+	Spinner   string
+}
+
+var utilities = []UtilityRunner{
+	{"Decode Raw Transaction", decodeRawTransaction, "Decoding Transaction..."},
+	{"Transaction History", transactionHistory, "Retrieving latest transactions..."},
+	{"Bech32", bech32Operation, ""},
+	{"Generate HD Private Key", generateHDPrivateKey, "Generating Hierarchical Deterministic Private Key..."},
+	{"Generate P2PKH Address from HD Private Key", generateP2PKHAddress, "Generating Address..."},
+	{"Get Price", getPrice, "Get BTC current price..."},
+	{"Get Recommended Fees", getRecommendedFees, "Get recommended fees..."},
+	{"Get Lightning Network Stats", getLightningNetworkStats, "Get lightning network statistics..."},
+	{"Get Lightning Top Nodes", getLightningTopNodes, "Get lightning network top nodes..."},
+	{"Get Last Block", getLastBlock, "Get last block in the blockchain..."},
+	{"Get Mempool Status", getMempoolStatus, "Get mempool status..."},
+	{"Get Current Hashrate", getCurrentHashrate, "Get current hashrate..."},
+}
+
 func Run() {
 	for {
-		var utility string
-
-		form := huh.NewForm(
-			huh.NewGroup(huh.NewNote().
-				Title("CraftBit").
-				Description("Welcome to CraftBit, the Bitcoin swiss army knife 🪛\n\nHow may we help you?")),
-
-			// Choose a utility.
-			huh.NewGroup(
-				huh.NewSelect[string]().
-					Options(huh.NewOptions("Decode Raw Transaction", "Bech32", "Transaction History", "Generate HD Private Key", "Generate P2PKH Address from HD Private Key",
-						"Get Price", "Get Recommended Fees", "Get Last Block", "Get Mempool Status", "Get Current Hashrate", "Get Lightning Network Stats", "Get Lightning Top Nodes", "Hack Bitcoin")...).
-					Title("Choose your utility").
-					Description("CraftBit has utilities for everyone!").
-					Validate(func(t string) error {
-						if t == "Hack Bitcoin" {
-							return fmt.Errorf("nice try, cannot do that, sorry 😊")
-						}
-						return nil
-					}).
-					Value(&utility),
-			),
-		)
-
-		err := form.Run()
-		if err != nil {
-			fmt.Println("Uh oh:", err)
-			os.Exit(1)
+		utility := chooseUtility()
+		if utility == "" {
+			break
 		}
 
-		switch utility {
-		case "Decode Raw Transaction":
-			rawTx := ""
-			formDecodeRawTransaction := huh.NewForm(
-				huh.NewGroup(
-					huh.NewInput().
-						Value(&rawTx).
-						Title("Paste the full raw transaction here").
-						Placeholder(".....").
-						Description("This is gonna be a loooong string"),
-				),
-			)
-			err := formDecodeRawTransaction.Run()
-			if err != nil {
-				fmt.Println("Uh oh:", err)
-				os.Exit(1)
+		for _, u := range utilities {
+			if u.Utility == utility {
+				runUtility(u)
+				break
 			}
-			decodedTx, err := pkg.DecodeRawTransaction(rawTx)
-			if err != nil {
-				fmt.Println("Error:", err)
-				return
-			}
-			// Compose the output string
-			var output strings.Builder
-			output.WriteString(fmt.Sprintf("TRANSACTION ID: %s\n", decodedTx.TxID))
-			for i, input := range decodedTx.Inputs {
-				inputStr := fmt.Sprintf("Previous Tx: %s, Output Index: %d, ScriptSig: %s\n", input.PreviousOutPoint.Hash.String(), input.PreviousOutPoint.Index, hex.EncodeToString(input.SignatureScript))
-				output.WriteString(fmt.Sprintf("TRANSACTION INPUT %d: %s\n", i+1, inputStr))
-			}
-			for i, out := range decodedTx.Outputs {
-				outputStr := fmt.Sprintf("Value: %d, ScriptPubKey: %s\n", out.Value, hex.EncodeToString(out.PkScript))
-				output.WriteString(fmt.Sprintf("TRANSACTION OUTPUT %d: %s\n", i+1, outputStr))
-			}
-			decodeTx := func() {
-				time.Sleep(1 * time.Second)
-			}
-
-			_ = spinner.New().Title("Decoding Transaction...").Action(decodeTx).Run()
-			fmt.Println(
-				lipgloss.NewStyle().
-					Width(100).
-					BorderStyle(lipgloss.RoundedBorder()).
-					BorderForeground(lipgloss.Color("63")).
-					Padding(1, 2).
-					Render(output.String()),
-			)
-
-		case "Transaction History":
-			address := ""
-			formTransactionHistory := huh.NewForm(
-				huh.NewGroup(
-					huh.NewInput().
-						Value(&address).
-						Title("Enter Bitcoin address").
-						Placeholder("e.g., bc1q0xs2775td0fm2t80m5alnmv5j6jhxqkgsdz5rv").
-						Description("Enter the Bitcoin address to fetch transaction history"),
-				),
-			)
-
-			err := formTransactionHistory.Run()
-			if err != nil {
-				fmt.Println("Uh oh:", err)
-				os.Exit(1)
-			}
-
-			transactionHistory, err := pkg.GetTransactionHistory(address)
-			if err != nil {
-				fmt.Println("Error:", err)
-				return
-			}
-
-			var transactionOutput string
-			transactionOutput += fmt.Sprintf("Transaction History for %s\n", address)
-			for i, tx := range transactionHistory {
-				transactionOutput += fmt.Sprintf("%d. TxID: %s, Fee: %d\n", i+1, tx.TxID, tx.Amount)
-			}
-
-			TxHistory := func() {
-				time.Sleep(1 * time.Second)
-			}
-
-			_ = spinner.New().Title("Retrieving latest transactions...").Action(TxHistory).Run()
-			fmt.Println(
-				lipgloss.NewStyle().
-					Width(100).
-					BorderStyle(lipgloss.RoundedBorder()).
-					BorderForeground(lipgloss.Color("63")).
-					Padding(1, 2).
-					Render(transactionOutput),
-			)
-
-		case "Bech32": // TO DO: COMPLETE LOGIC
-			var operation string
-			formBech32 := huh.NewForm(
-				huh.NewGroup(huh.NewNote().
-					Title("Bech32").
-					Description("Bech32\n\nWhat Bech32 operaton do you want to perform?")),
-
-				// Choose a Bech32 operation.
-				huh.NewGroup(
-					huh.NewSelect[string]().
-						Options(huh.NewOptions("Decode String", "Encode String")...).
-						Title("Choose your operation").
-						Value(&operation),
-				),
-			)
-
-			err := formBech32.Run()
-			if err != nil {
-				fmt.Println("Uh oh:", err)
-				os.Exit(1)
-			}
-
-			switch operation {
-			case "Encode String":
-				hrp := "customHrp!11111q"
-				data := []byte("Test data")
-				encoded, err := pkg.EncodeBech32(hrp, data)
-				if err != nil {
-					fmt.Println("Error:", err)
-					return
-				}
-				fmt.Println("Encoded Data:", encoded)
-
-				decodedHrp, decodedData, err := pkg.DecodeBech32(encoded)
-				if err != nil {
-					fmt.Println("Error:", err)
-					return
-				}
-				fmt.Println("Decoded HRP:", decodedHrp)
-				fmt.Println("Decoded Data:", string(decodedData))
-			}
-
-		case "Generate HD Private Key":
-			privateKey, err := pkg.GenerateHDPrivateKey()
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			generateSeed := func() {
-				time.Sleep(1 * time.Second)
-			}
-
-			_ = spinner.New().Title("Generating Hierarchical Deterministic Private Key...").Action(generateSeed).Run()
-			keyOutput := "BASE58 PRIVATE KEY:\n" + privateKey + "\n\nDO NOT SHARE WITH ANYONE 💀"
-			fmt.Println(
-				lipgloss.NewStyle().
-					Width(100).
-					BorderStyle(lipgloss.RoundedBorder()).
-					BorderForeground(lipgloss.Color("63")).
-					Padding(1, 2).
-					Render(keyOutput),
-			)
-
-		case "Generate P2PKH Address from HD Private Key":
-			hdPrivateKey := ""
-			formAddressFromHdPrivateKey := huh.NewForm(
-				huh.NewGroup(
-					huh.NewInput().
-						Value(&hdPrivateKey).
-						Title("Enter Bitcoin extended private key (xprv)").
-						Placeholder("e.g., xprv9s21ZrQH143K2TQH119ScPgTzuL2mw2USC7QzsogsFobCeaSZ8Q8kUUMtkPWSksAEiDTSvRhtWkhk5AfZizxcWqx5NXDwkxKiJcnSGavNUZ").
-						Description("Enter the Bitcoin HD Private Key for wich to generate a new address"),
-				),
-			)
-
-			err := formAddressFromHdPrivateKey.Run()
-			if err != nil {
-				fmt.Println("Uh oh:", err)
-				os.Exit(1)
-			}
-
-			key, err := pkg.CreateP2pkhAddressFromPrivateKey(hdPrivateKey)
-			if err != nil {
-				fmt.Println("Error:", err)
-				return
-			}
-
-			var transactionOutput string
-			transactionOutput += fmt.Sprintf("Transaction History for %s\n", key)
-
-			AddressFromPrivateKey := func() {
-				time.Sleep(1 * time.Second)
-			}
-
-			_ = spinner.New().Title("Generating Address...").Action(AddressFromPrivateKey).Run()
-			fmt.Println(
-				lipgloss.NewStyle().
-					Width(100).
-					BorderStyle(lipgloss.RoundedBorder()).
-					BorderForeground(lipgloss.Color("63")).
-					Padding(1, 2).
-					Render("Generated P2PKH Address\n" + key),
-			)
-
-		case "Get Price":
-			prices, err := pkg.GetPrices()
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			getPrices := func() {
-				time.Sleep(1 * time.Second)
-			}
-
-			_ = spinner.New().Title("Get BTC current price...").Action(getPrices).Run()
-			pricesDTO := StructFieldsToString(prices)
-			fmt.Println(
-				lipgloss.NewStyle().
-					Width(100).
-					BorderStyle(lipgloss.RoundedBorder()).
-					BorderForeground(lipgloss.Color("63")).
-					Padding(1, 2).
-					Render("PRICE\n\n" + pricesDTO),
-			)
-
-		case "Get Recommended Fees":
-			fees, err := pkg.GetFees()
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			getFees := func() {
-				time.Sleep(1 * time.Second)
-			}
-
-			_ = spinner.New().Title("Get recommended fees...").Action(getFees).Run()
-			feesDTO := StructFieldsToString(fees)
-			fmt.Println(
-				lipgloss.NewStyle().
-					Width(100).
-					BorderStyle(lipgloss.RoundedBorder()).
-					BorderForeground(lipgloss.Color("63")).
-					Padding(1, 2).
-					Render("RECOMMENDED FEES\n\n" + feesDTO),
-			)
-
-		case "Get Lightning Network Stats":
-			lnStats, err := pkg.GetLightningStatistics()
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			getLnStats := func() {
-				time.Sleep(1 * time.Second)
-			}
-
-			_ = spinner.New().Title("Get lightning network statistics...").Action(getLnStats).Run()
-			lnStatsDTO := StructFieldsToString(lnStats.Latest)
-			fmt.Println(
-				lipgloss.NewStyle().
-					Width(100).
-					BorderStyle(lipgloss.RoundedBorder()).
-					BorderForeground(lipgloss.Color("63")).
-					Padding(1, 2).
-					Render("LIGHTNING NETWORK STATS\n\n" + lnStatsDTO),
-			)
-
-		case "Get Lightning Top Nodes":
-			lnTopNodes, err := pkg.GetLightningTopNodes()
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			getLnTopNodes := func() {
-				time.Sleep(1 * time.Second)
-			}
-
-			_ = spinner.New().Title("Get lightning network top nodes...").Action(getLnTopNodes).Run()
-			lnTopNodesCapacity := lnTopNodes.ByCapacityString()
-			fmt.Println(
-				lipgloss.NewStyle().
-					Width(100).
-					BorderStyle(lipgloss.RoundedBorder()).
-					BorderForeground(lipgloss.Color("63")).
-					Padding(1, 2).
-					Render("LIGHTNING TOP NODES BY CAPACITY\n\n" + lnTopNodesCapacity),
-			)
-			lnTopNodesChannels := lnTopNodes.ByChannelsString()
-			fmt.Println(
-				lipgloss.NewStyle().
-					Width(100).
-					BorderStyle(lipgloss.RoundedBorder()).
-					BorderForeground(lipgloss.Color("63")).
-					Padding(1, 2).
-					Render("LIGHTNING TOP NODES BY NUMBER OF CHANNELS\n\n" + lnTopNodesChannels),
-			)
-
-		case "Get Last Block":
-			lastBlock, err := pkg.GetLastBlock()
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			getLastBlock := func() {
-				time.Sleep(1 * time.Second)
-			}
-
-			_ = spinner.New().Title("Get last block in the blockchain...").Action(getLastBlock).Run()
-			fmt.Println(
-				lipgloss.NewStyle().
-					Width(100).
-					BorderStyle(lipgloss.RoundedBorder()).
-					BorderForeground(lipgloss.Color("63")).
-					Padding(1, 2).
-					Render("LAST BLOCK\n\n" + lastBlock),
-			)
-
-		case "Get Mempool Status":
-			mempoolStatus, err := pkg.GetMempoolStatus()
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			getMempoolStatus := func() {
-				time.Sleep(1 * time.Second)
-			}
-
-			_ = spinner.New().Title("Get mempool status...").Action(getMempoolStatus).Run()
-			mempoolStatusDTO := StructFieldsToString(mempoolStatus)
-			fmt.Println(
-				lipgloss.NewStyle().
-					Width(100).
-					BorderStyle(lipgloss.RoundedBorder()).
-					BorderForeground(lipgloss.Color("63")).
-					Padding(1, 2).
-					Render("MEMPOOL STATUS\n\n" + mempoolStatusDTO),
-			)
-
-		case "Get Current Hashrate":
-			currentHashrate, err := pkg.GetCurrentHashrate()
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			getCurrentHashrate := func() {
-				time.Sleep(1 * time.Second)
-			}
-
-			_ = spinner.New().Title("Get current hashrate...").Action(getCurrentHashrate).Run()
-			currentHashrateDTO := StructFieldsToString(currentHashrate)
-			fmt.Println(
-				lipgloss.NewStyle().
-					Width(100).
-					BorderStyle(lipgloss.RoundedBorder()).
-					BorderForeground(lipgloss.Color("63")).
-					Padding(1, 2).
-					Render("CURRENT HASHRATE\n\n" + currentHashrateDTO),
-			)
-
-		default:
-			fmt.Println("Invalid selection")
-			continue
 		}
 
-		// After executing a single utility, ask the user if they want to return to the main form
-		var returnToMainForm bool
-		formReturn := huh.NewForm(
-			huh.NewGroup(
-				huh.NewConfirm().
-					Title("Return to main form?").
-					Value(&returnToMainForm).
-					Description("Do you want to select another Bitcoin utility?"),
-			),
-		)
-
-		// Run the return form
-		err = formReturn.Run()
-		if err != nil {
-			fmt.Println("Uh oh:", err)
-			os.Exit(1)
-		}
-
-		// If the user chooses not to return to the main form, exit the loop
-		if !returnToMainForm {
+		if !returnToMainForm() {
 			break
 		}
 	}
-
 }
 
-func PrintStructFields(s interface{}) {
-	val := reflect.ValueOf(s)
-	typ := val.Type()
+func chooseUtility() string {
+	var utility string
 
-	for i := 0; i < val.NumField(); i++ {
-		field := val.Field(i)
-		fieldName := typ.Field(i).Name
-		fieldValue := field.Interface()
+	form := huh.NewForm(
+		huh.NewGroup(huh.NewNote().
+			Title("CraftBit").
+			Description("Welcome to CraftBit, the Bitcoin swiss army knife 🪛\n\nHow may we help you?")),
 
-		fmt.Printf("%s: %v\n", fieldName, fieldValue)
+		// Choose a utility.
+		huh.NewGroup(
+			huh.NewSelect[string]().
+				Options(huh.NewOptions(getUtilityNames()...)...).
+				Title("Choose your utility").
+				Description("CraftBit has utilities for everyone!").
+				Validate(func(t string) error {
+					if t == "Hack Bitcoin" {
+						return fmt.Errorf("nice try, cannot do that, sorry 😊")
+					}
+					return nil
+				}).
+				Value(&utility),
+		),
+	)
+
+	err := form.Run()
+	if err != nil {
+		fmt.Println("Uh oh:", err)
+		os.Exit(1)
 	}
+
+	return utility
+}
+
+func getUtilityNames() []string {
+	names := make([]string, len(utilities))
+	for i, u := range utilities {
+		names[i] = u.Utility
+	}
+	return names
+}
+
+func runUtility(utility UtilityRunner) {
+	result, err := utility.Operation()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	if utility.Spinner != "" {
+		runSpinner(utility.Spinner)
+	}
+
+	printResult(result)
+}
+
+func runSpinner(msg string) {
+	decodeTx := func() {
+		time.Sleep(1 * time.Second)
+	}
+
+	_ = spinner.New().Title(msg).Action(decodeTx).Run()
+}
+
+func printResult(result interface{}) {
+	// Perform type assertion to convert result to string
+	strResult, ok := result.(string)
+	if !ok {
+		fmt.Println("Error: result is not a string")
+		return
+	}
+
+	fmt.Println(
+		lipgloss.NewStyle().
+			Width(100).
+			BorderStyle(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color("63")).
+			Padding(1, 2).
+			Render(strResult),
+	)
+}
+
+func returnToMainForm() bool {
+	var returnToMainForm bool
+	formReturn := huh.NewForm(
+		huh.NewGroup(
+			huh.NewConfirm().
+				Title("Return to main form?").
+				Value(&returnToMainForm).
+				Description("Do you want to select another Bitcoin utility?"),
+		),
+	)
+
+	err := formReturn.Run()
+	if err != nil {
+		fmt.Println("Uh oh:", err)
+		os.Exit(1)
+	}
+
+	return returnToMainForm
+}
+
+func decodeRawTransaction() (interface{}, error) {
+	rawTx := ""
+
+	formDecodeRawTransaction := huh.NewForm(
+		huh.NewGroup(
+			huh.NewInput().
+				Value(&rawTx).
+				Title("Paste the full raw transaction here").
+				Placeholder(".....").
+				Description("This is gonna be a loooong string"),
+		),
+	)
+
+	err := formDecodeRawTransaction.Run()
+	if err != nil {
+		return nil, err
+	}
+
+	decodedTx, err := pkg.DecodeRawTransaction(rawTx)
+	if err != nil {
+		return nil, err
+	}
+
+	var output strings.Builder
+	output.WriteString(fmt.Sprintf("TRANSACTION ID: %s\n", decodedTx.TxID))
+	for i, input := range decodedTx.Inputs {
+		inputStr := fmt.Sprintf("Previous Tx: %s, Output Index: %d, ScriptSig: %s\n", input.PreviousOutPoint.Hash.String(), input.PreviousOutPoint.Index, hex.EncodeToString(input.SignatureScript))
+		output.WriteString(fmt.Sprintf("TRANSACTION INPUT %d: %s\n", i+1, inputStr))
+	}
+	for i, out := range decodedTx.Outputs {
+		outputStr := fmt.Sprintf("Value: %d, ScriptPubKey: %s\n", out.Value, hex.EncodeToString(out.PkScript))
+		output.WriteString(fmt.Sprintf("TRANSACTION OUTPUT %d: %s\n", i+1, outputStr))
+	}
+
+	return output.String(), nil
+}
+
+func transactionHistory() (interface{}, error) {
+	address := ""
+
+	formTransactionHistory := huh.NewForm(
+		huh.NewGroup(
+			huh.NewInput().
+				Value(&address).
+				Title("Enter Bitcoin address").
+				Placeholder("e.g., bc1q0xs2775td0fm2t80m5alnmv5j6jhxqkgsdz5rv").
+				Description("Enter the Bitcoin address to fetch transaction history"),
+		),
+	)
+
+	err := formTransactionHistory.Run()
+	if err != nil {
+		return nil, err
+	}
+
+	transactionHistory, err := pkg.GetTransactionHistory(address)
+	if err != nil {
+		return nil, err
+	}
+
+	var transactionOutput strings.Builder
+	transactionOutput.WriteString(fmt.Sprintf("Transaction History for %s\n", address))
+	for i, tx := range transactionHistory {
+		transactionOutput.WriteString(fmt.Sprintf("%d. TxID: %s, Fee: %d\n", i+1, tx.TxID, tx.Amount))
+	}
+
+	return transactionOutput.String(), nil
+}
+
+func bech32Operation() (interface{}, error) {
+	var operation string
+	formBech32 := huh.NewForm(
+		huh.NewGroup(huh.NewNote().
+			Title("Bech32").
+			Description("Bech32\n\nWhat Bech32 operation do you want to perform?")),
+
+		// Choose a Bech32 operation.
+		huh.NewGroup(
+			huh.NewSelect[string]().
+				Options(huh.NewOptions("Decode String", "Encode String")...).
+				Title("Choose your operation").
+				Value(&operation),
+		),
+	)
+
+	err := formBech32.Run()
+	if err != nil {
+		return nil, err
+	}
+
+	switch operation {
+	case "Encode String":
+		hrp := "customHrp!11111q"
+		data := []byte("Test data")
+		encoded, err := pkg.EncodeBech32(hrp, data)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println("Encoded Data:", encoded)
+
+		decodedHrp, decodedData, err := pkg.DecodeBech32(encoded)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println("Decoded HRP:", decodedHrp)
+		fmt.Println("Decoded Data:", string(decodedData))
+	}
+
+	return nil, nil
+}
+
+func generateHDPrivateKey() (interface{}, error) {
+	privateKey, err := pkg.GenerateHDPrivateKey()
+	if err != nil {
+		return nil, err
+	}
+
+	keyOutput := "BASE58 PRIVATE KEY:\n" + privateKey + "\n\nDO NOT SHARE WITH ANYONE 💀"
+	return keyOutput, nil
+}
+
+func generateP2PKHAddress() (interface{}, error) {
+	hdPrivateKey := ""
+	formAddressFromHdPrivateKey := huh.NewForm(
+		huh.NewGroup(
+			huh.NewInput().
+				Value(&hdPrivateKey).
+				Title("Enter Bitcoin extended private key (xprv)").
+				Placeholder("e.g., xprv9s21ZrQH143K2TQH119ScPgTzuL2mw2USC7QzsogsFobCeaSZ8Q8kUUMtkPWSksAEiDTSvRhtWkhk5AfZizxcWqx5NXDwkxKiJcnSGavNUZ").
+				Description("Enter the Bitcoin HD Private Key for which to generate a new address"),
+		),
+	)
+
+	err := formAddressFromHdPrivateKey.Run()
+	if err != nil {
+		return nil, err
+	}
+
+	key, err := pkg.CreateP2pkhAddressFromPrivateKey(hdPrivateKey)
+	if err != nil {
+		return nil, err
+	}
+
+	return "Generated P2PKH Address\n" + key, nil
+}
+
+func getPrice() (interface{}, error) {
+	prices, err := pkg.GetPrices()
+	if err != nil {
+		return nil, err
+	}
+
+	return StructFieldsToString(prices), nil
+}
+
+func getRecommendedFees() (interface{}, error) {
+	fees, err := pkg.GetFees()
+	if err != nil {
+		return nil, err
+	}
+
+	return StructFieldsToString(fees), nil
+}
+
+func getLightningNetworkStats() (interface{}, error) {
+	lnStats, err := pkg.GetLightningStatistics()
+	if err != nil {
+		return nil, err
+	}
+
+	return StructFieldsToString(lnStats.Latest), nil
+}
+
+func getLightningTopNodes() (interface{}, error) {
+	lnTopNodes, err := pkg.GetLightningTopNodes()
+	if err != nil {
+		return nil, err
+	}
+
+	lnTopNodesCapacity := lnTopNodes.ByCapacityString()
+	lnTopNodesChannels := lnTopNodes.ByChannelsString()
+
+	return "LIGHTNING TOP NODES BY CAPACITY\n\n" + lnTopNodesCapacity + "\n\nLIGHTNING TOP NODES BY NUMBER OF CHANNELS\n\n" + lnTopNodesChannels, nil
+}
+
+func getLastBlock() (interface{}, error) {
+	lastBlock, err := pkg.GetLastBlock()
+	if err != nil {
+		return nil, err
+	}
+
+	return "LAST BLOCK\n\n" + lastBlock, nil
+}
+
+func getMempoolStatus() (interface{}, error) {
+	mempoolStatus, err := pkg.GetMempoolStatus()
+	if err != nil {
+		return nil, err
+	}
+
+	return StructFieldsToString(mempoolStatus), nil
+}
+
+func getCurrentHashrate() (interface{}, error) {
+	currentHashrate, err := pkg.GetCurrentHashrate()
+	if err != nil {
+		return nil, err
+	}
+
+	return StructFieldsToString(currentHashrate), nil
 }
 
 func StructFieldsToString(s interface{}) string {

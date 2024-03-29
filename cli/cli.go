@@ -36,9 +36,9 @@ var utilities = []UtilityRunner{
 	{"Hack Bitcoin 👾", nil, ""},
 }
 
-func Run() {
+func Run(version string) {
 	for {
-		utility := chooseUtility()
+		utility := chooseUtility(version)
 		if utility == "" {
 			break
 		}
@@ -56,12 +56,13 @@ func Run() {
 	}
 }
 
-func chooseUtility() string {
+func chooseUtility(version string) string {
 	var utility string
+	title := fmt.Sprintf("CraftBit v%s", version)
 
 	form := huh.NewForm(
 		huh.NewGroup(huh.NewNote().
-			Title("CraftBit").
+			Title(title).
 			Description("Welcome to CraftBit, the Bitcoin swiss army knife 🪛\n\nHow may we help you?")),
 
 		// Choose a utility.

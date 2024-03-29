@@ -8,7 +8,7 @@
 Bitcoin Swiss Army Knife 🪛 🌕 🔧
 
 ## Abstract
-This software is a lightweight Command Line Interface (CLI) containing multiple utilities designed for interacting with the Bitcoin ecosystem.  
+This software is a lightweight, multi-platform Command Line Interface (CLI) containing multiple utilities designed for interacting with the Bitcoin ecosystem.  
 Most of these utilities either serve as wrappers for [*btcd*](https://github.com/btcsuite/btcd) libraries or make calls to the [*mempool.space REST APIs*](https://mempool.space/docs/api/rest).  
 
 > [!WARNING] 
